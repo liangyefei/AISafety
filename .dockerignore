@@ -1,0 +1,10 @@
+node_modules
+dist
+.git
+.vscode
+backend/data
+backend/models/*
+!backend/models/spam_pipeline_pinyin.joblib
+backend/datasets
+backend/__pycache__
+backend/.pytest_cache

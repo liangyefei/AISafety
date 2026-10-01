@@ -1,0 +1,111 @@
+{
+  "version": "1.2.0",
+  "models": [
+    {
+      "id": "spam",
+      "label": "营销垃圾模型",
+      "dimension": "spam",
+      "path": "models/spam_pipeline_pinyin.joblib",
+      "estimator": "LogisticRegression(class_weight=balanced)",
+      "features": [
+        {
+          "name": "characters",
+          "label": "字符 TF-IDF",
+          "analyzer": "char",
+          "ngram_range": [
+            2,
+            5
+          ],
+          "max_features": 80000,
+          "weight": 1.0,
+          "note": "原字面 n-gram，主通道"
+        },
+        {
+          "name": "pinyin",
+          "label": "拼音 TF-IDF",
+          "analyzer": "char",
+          "ngram_range": [
+            2,
+            6
+          ],
+          "max_features": 60000,
+          "weight": 0.7,
+          "note": "谐音变体归一，权重低于原字面"
+        }
+      ],
+      "trained_rows": 21946,
+      "note": "判别诈骗、博彩、色情引流、黑产广告等营销类垃圾"
+    },
+    {
+      "id": "abuse",
+      "label": "辱骂歧视模型",
+      "dimension": "abuse",
+      "path": "models/abuse_pipeline_pinyin.joblib",
+      "estimator": "LogisticRegression(class_weight=balanced)",
+      "features": [
+        {
+          "name": "characters",
+          "label": "字符 TF-IDF",
+          "analyzer": "char",
+          "ngram_range": [
+            2,
+            5
+          ],
+          "max_features": 80000,
+          "weight": 1.0,
+          "note": "原字面 n-gram，主通道"
+        },
+        {
+          "name": "pinyin",
+          "label": "拼音 TF-IDF",
+          "analyzer": "char",
+          "ngram_range": [
+            2,
+            6
+          ],
+          "max_features": 60000,
+          "weight": 0.7,
+          "note": "谐音变体归一，权重低于原字面"
+        }
+      ],
+      "trained_rows": 14898,
+      "note": "判别人身攻击与隐式歧视言论，含 STATE-ToxiCN 俚语特征"
+    }
+  ],
+  "thresholds": {
+    "rule_spam": 0.72,
+    "model_spam": 0.65,
+    "review": 0.35,
+    "abuse_spam": 0.65,
+    "abuse_suspicious": 0.4,
+    "abuse_review": 0.35
+  },
+  "fusion": {
+    "strategy": "规则分对模型分单向加权，模型分不可反向压制规则分",
+    "rule_boost_factor": 0.5,
+    "aggregation": "max(rule_score, boosted_model_score)",
+    "long_text_bonus": 0.08,
+    "long_text_threshold": 500
+  },
+  "rules": {
+    "spam": {
+      "gambling": 0.72,
+      "prize": 0.58,
+      "loan": 0.55,
+      "adult-lure": 0.55,
+      "contact-wechat": 0.42,
+      "contact-numeric-id": 0.42,
+      "contact-phone": 0.36,
+      "external-link": 0.28,
+      "urgency": 0.2
+    },
+    "abuse": {
+      "abuse-family": 0.72,
+      "abuse-insult": 0.6,
+      "abuse-dehumanize": 0.5,
+      "abuse-obfuscated": 0.5,
+      "abuse-advocacy": -0.6,
+      "abuse-slur": 0.3
+    }
+  }
+}
